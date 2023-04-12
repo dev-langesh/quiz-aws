@@ -71,7 +71,7 @@ export default function Result() {
   }, []);
 
   return (
-    <section className=" bg-gray-900 text-white h-screen w-screen flex items-center justify-center flex-col space-y-6 text-center">
+    <section className="relative bg-gray-900 text-white h-screen w-screen flex items-center justify-center flex-col space-y-6 text-center">
       {loading ? (
         <CircularProgress />
       ) : (
@@ -86,6 +86,15 @@ export default function Result() {
           </main>
         </>
       )}
+
+      <div className="absolute bottom-6 right-6">
+        <a
+          className="px-6 py-2 bg-blue-500 text-white"
+          href="https://www.langesh.in"
+        >
+          About the dev
+        </a>
+      </div>
     </section>
   );
 }

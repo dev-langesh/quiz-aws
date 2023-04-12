@@ -58,8 +58,6 @@ export async function isUserStartedQuiz(req: Request, res: Response) {
 
     const { roll_no } = req.body;
 
-    console.log(req.body);
-
     const params: GetItemT = {
       TableName,
       FilterExpression: "roll_no = :rno_value",
@@ -76,8 +74,6 @@ export async function isUserStartedQuiz(req: Request, res: Response) {
     if (db.error) {
       throw new Error(db.error);
     }
-
-    console.log(db.Items[0]);
 
     // db.Items[0].started.S ||
 
@@ -96,14 +92,15 @@ export async function isUserStartedQuiz(req: Request, res: Response) {
       };
 
       const up = await updateItemInDynamoDB(updateParams);
-
-      console.log(up);
     }
 
     return res.json({ message: "success" });
   } catch (err: any) {
-    console.log(err);
-    if (err) res.json({ error: err.message });
+    if (err) {
+      console.log(err);
+
+      res.json({ error: err.message });
+    }
   }
 }
 
