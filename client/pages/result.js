@@ -2,6 +2,8 @@ import { CircularProgress } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMarks, setResult } from "../src/features/markSlice";
+import { getUser } from "../src/features/userSlice";
+import axios from "axios";
 
 export default function Result() {
   const result = useSelector(getMarks);
@@ -9,16 +11,22 @@ export default function Result() {
 
   const effRan = useRef(false);
 
+  const user = useSelector(getUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!effRan.current) {
-      const id = window.localStorage.getItem("id");
-
       async function getMarks() {
-        const response = await fetch(`/api/get-result/${id}`, {
-          method: "GET",
-        });
+        const payload = {
+          roll_no: user.roll_no,
+          score: result.score,
+          correct_answers: result.correctAnswers,
+        };
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/user/is-started-quiz`,
+          payload
+        );
 
         const data = await response.json();
 
@@ -35,16 +43,28 @@ export default function Result() {
         setLoading(false);
       }
 
-      getMarks();
+      // getMarks();
 
       async function postMarks() {
-        const response = await fetch(`/api/set-result/${id}`, {
-          method: "PUT",
-          body: JSON.stringify(result),
-        });
+        const payload = {
+          roll_no: user.roll_no,
+          score: result.score,
+          correct_answers: result.correctAnswers,
+        };
 
-        const data = await response.json();
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/user/set-score`,
+          payload
+        );
+
+        const data = response.data;
+
+        setLoading(false);
+
+        console.log(data);
       }
+
+      postMarks();
 
       return () => (effRan.current = true);
     }

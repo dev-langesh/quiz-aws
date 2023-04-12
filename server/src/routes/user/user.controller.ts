@@ -78,7 +78,10 @@ export async function isUserStartedQuiz(req: Request, res: Response) {
     }
 
     console.log(db.Items[0]);
-    if (db.Items[0].started.S) {
+
+    // db.Items[0].started.S ||
+
+    if (db.Items[0].started.BOOL) {
       throw new Error("Already started");
     } else {
       const updateParams: UpdateItemT = {
@@ -101,5 +104,77 @@ export async function isUserStartedQuiz(req: Request, res: Response) {
   } catch (err: any) {
     console.log(err);
     if (err) res.json({ error: err.message });
+  }
+}
+
+// POST /user/set-score
+export async function setScore(req: Request, res: Response) {
+  try {
+    const TableName: string = process.env.DYNAMO_DB_TABLE_NAME || "";
+
+    const { score, correct_answers, roll_no } = req.body;
+
+    const updateParams: UpdateItemT = {
+      TableName,
+      Key: {
+        roll_no,
+      },
+      UpdateExpression:
+        "set score = :score_value, correct_answers = :correct_value",
+      ExpressionAttributeValues: {
+        ":score_value": score,
+        ":correct_value": correct_answers,
+      },
+    };
+
+    const up = await updateItemInDynamoDB(updateParams);
+
+    console.log(up);
+
+    res.json({ message: "success", up });
+  } catch (err: any) {
+    if (err) {
+      console.log(err);
+
+      res.json({ error: err.message });
+    }
+  }
+}
+
+// GET /get-score
+export async function getScore(req: Request, res: Response) {
+  try {
+    const TableName: string = process.env.DYNAMO_DB_TABLE_NAME || "";
+
+    const { roll_no } = req.body;
+
+    const params: GetItemT = {
+      TableName,
+      FilterExpression: "roll_no = :rno",
+
+      ExpressionAttributeValues: {
+        ":rno": {
+          S: roll_no,
+        },
+      },
+    };
+
+    const db: any = await getItemFromDynamoDB(params);
+
+    if (db.error) {
+      throw new Error(db.error);
+    }
+
+    const data = db.Items[0];
+
+    console.log(data);
+
+    return res.json(data);
+  } catch (err: any) {
+    if (err) {
+      console.log(err);
+
+      res.json({ error: err.message });
+    }
   }
 }

@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import QuizContainer from "../components/quiz/QuizContainer";
 import { useSelector } from "react-redux";
 import { getUser } from "../src/features/userSlice";
+import axios from "axios";
 
 export default function Quiz() {
   const [error, setError] = useState("");
@@ -22,16 +23,21 @@ export default function Quiz() {
       }
 
       async function validateUser() {
-        const response = await fetch("/user/is-started-quiz", {
-          method: "POST",
-          body: JSON.stringify({
-            id,
-          }),
-        });
+        if (!user.roll_no) {
+          setError("Roll no not defined");
+          return;
+        }
 
-        const data = await response.json();
+        const payload = {
+          roll_no: user.roll_no,
+        };
 
-        console.log(data);
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/user/is-started-quiz`,
+          payload
+        );
+
+        const data = response.data;
 
         if (data.isStarted) {
           setError("You have already responded to this quiz");
@@ -40,9 +46,7 @@ export default function Quiz() {
 
       validateUser();
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+      setLoading(false);
     }
 
     return () => (effRan.current = true);
