@@ -9,9 +9,11 @@ import {
 } from "../../src/features/questionCountSlice";
 import { useRouter } from "next/router";
 
+const initialTimer = 60;
+
 export default function QuizContainer() {
   const questionNumber = useSelector(getQuestionNumber);
-  const [timer, setTimer] = useState(100);
+  const [timer, setTimer] = useState(initialTimer);
 
   const effRan = useRef(false);
 
@@ -34,7 +36,7 @@ export default function QuizContainer() {
         router.push("/result");
       } else {
         dispatch(nextQuestion());
-        setTimer(10);
+        setTimer(initialTimer);
       }
     }
   }, [timer]);
@@ -51,7 +53,7 @@ export default function QuizContainer() {
       router.push("/result");
     } else {
       dispatch(nextQuestion());
-      setTimer(10);
+      setTimer(initialTimer);
     }
   }
 
