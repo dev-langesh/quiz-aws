@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-dep
+spec:
+  selector:
+    matchLabels:
+      app: quiz
+  template:
+    metadata:
+      labels:
+        app: quiz
+    spec:
+      containers:
+        - name: quiz
+          image: devlangesh/quiz-bk
+          env:
+            - name: PORT
+              value: "8000"
+            - name: DYNAMO_DB_TABLE_NAME
+              value: quiz
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
