@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    image: quiz-bk
+    environment:
+      - PORT=8000
+      - DYNAMO_DB_TABLE_NAME=quiz
+    ports:
+      - 8000:8000
